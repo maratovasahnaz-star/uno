@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Әдеби UNO - Білім беру платформасы</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .uno-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .uno-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .bg-uno-red { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border-color: #fca5a5; }
+        .bg-uno-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-color: #93c5fd; }
+        .bg-uno-green { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); border-color: #86efac; }
+        .bg-uno-yellow { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); border-color: #fde047; }
+        .bg-uno-wild { background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); border-color: #f472b6; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        @keyframes turn-pulse {
+            0%, 100% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.8); }
+            50% { box-shadow: 0 0 25px rgba(245, 158, 11, 1); }
+        }
+
+        .active-turn-pulse {
+            animation: turn-pulse 1.4s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between overflow-x-hidden">
+
+    <!-- Header Navigation -->
+    <header class="glass-panel sticky top-0 z-40 px-6 py-4 flex justify-between items-center shadow-lg border-b border-slate-700">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('screen-login')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 flex items-center justify-center font-black text-xl shadow-lg">
+                Ұ
+            </div>
+            <span class="font-black text-2xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-300">
+                ӘДЕБИ UNO
+            </span>
+        </div>
+
+        <div id="header-user-info" class="hidden flex items-center space-x-4">
+            <div class="bg-slate-800/90 px-4 py-2 rounded-xl border border-slate-700 flex items-center space-x-3">
+                <i class="fa-solid fa-user-graduate text-amber-400"></i>
+                <span id="display-user-name" class="font-bold text-slate-200">Ойыншы</span>
+                <span id="display-user-grade" class="bg-indigo-600/60 text-indigo-200 text-xs px-2 py-0.5 rounded-md font-semibold">6-сынып</span>
+            </div>
+            <button onclick="showScreen('screen-leaderboard')" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Рейтинг</span>
+            </button>
+            <button onclick="logout()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 p-2 rounded-xl text-sm transition">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-4">
+
+        <!-- 1. LOGIN SCREEN -->
+        <section id="screen-login" class="w-full max-w-md">
+            <div class="glass-panel p-8 rounded-3xl shadow-2xl border border-slate-700/60 text-center relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl"></div>
+
+                <h1 class="text-3xl font-black mb-2 text-white">Қош келдіңіз!</h1>
+                <p class="text-slate-400 text-sm mb-6">"Әдеби UNO" оқу-интерактивті платформасы</p>
+
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Оқушының аты-жөні</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-500"></i>
+                            <input type="text" id="input-name" required placeholder="Мысалы: Шахназ Маратова" 
+                                class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Сыныпты таңдаңыз</label>
+                        <select id="input-grade" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="6">6-сынып</option>
+                            <option value="7">7-сынып</option>
+                            <option value="10">10-сынып</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-bold rounded-xl shadow-lg transform active:scale-95 transition duration-200 flex items-center justify-center space-x-2">
+                        <span>Ойынға кіру</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-slate-700/60">
+                    <button onclick="openTeacherMode()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center space-x-2 text-sm">
+                        <i class="fa-solid fa-chalkboard-user text-amber-400"></i>
+                        <span>Мұғалім кабинеті (Рейтинг бақылау)</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. NAVIGATION & TOPICS SCREEN -->
+        <section id="screen-nav" class="hidden w-full max-w-5xl">
+            <div class="space-y-8">
+                <div class="glass-panel p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-white">Оқу Бөлімдері</h2>
+                        <p class="text-slate-400 text-sm">Сынып пен тоқсанды таңдап, UNO ойынын бастаңыз</p>
+                    </div>
+                    <div class="flex bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 space-x-1">
+                        <button onclick="selectGrade('6')" id="btn-grade-6" class="px-5 py-2.5 rounded-lg font-bold text-sm transition bg-indigo-600 text-white shadow-lg">6-сынып</button>
+                        <button onclick="selectGrade('7')" id="btn-grade-7" class="px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-400 hover:text-white">7-сынып</button>
+                        <button onclick="selectGrade('10')" id="btn-grade-10" class="px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-400 hover:text-white">10-сынып</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="selectQuarter(1)" id="btn-q-1" class="glass-panel p-5 rounded-2xl text-center border-2 border-indigo-500/50 bg-indigo-500/10 font-bold text-lg text-white hover:border-indigo-400 transition">1-тоқсан</button>
+                    <button onclick="selectQuarter(2)" id="btn-q-2" class="glass-panel p-5 rounded-2xl text-center border border-slate-700 text-slate-400 opacity-60 cursor-not-allowed">2-тоқсан (Жуырда)</button>
+                    <button onclick="selectQuarter(3)" id="btn-q-3" class="glass-panel p-5 rounded-2xl text-center border border-slate-700 text-slate-400 opacity-60 cursor-not-allowed">3-тоқсан (Жуырда)</button>
+                    <button onclick="selectQuarter(4)" id="btn-q-4" class="glass-panel p-5 rounded-2xl text-center border border-slate-700 text-slate-400 opacity-60 cursor-not-allowed">4-тоқсан (Жуырда)</button>
+                </div>
+
+                <div id="topics-container" class="space-y-4">
+                    <h3 class="text-xl font-bold text-amber-400 flex items-center space-x-2">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span>1-тоқсан бойынша Әдеби UNO ойындары:</span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="games-grid">
+                        <!-- Dynamic Topic Cards Loaded Here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. INTERACTIVE UNO GAMEPLAY SCREEN -->
+        <section id="screen-game" class="hidden w-full max-w-5xl">
+            <div class="glass-panel p-6 rounded-3xl shadow-2xl relative border border-slate-700">
+                
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-700/80 pb-4 mb-6 gap-4">
+                    <div>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest" id="game-topic-tag">ТАҚЫРЫП</span>
+                        <h2 class="text-2xl font-black text-white" id="game-topic-title">Доспамбет жырау</h2>
+                    </div>
+
+                    <div class="flex items-center space-x-3 bg-slate-900/90 px-5 py-2.5 rounded-2xl border border-slate-700">
+                        <span class="text-xs font-bold text-slate-400 uppercase">ЖҮРІС:</span>
+                        <div id="turn-badge" class="flex items-center space-x-2 px-4 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-black text-sm active-turn-pulse">
+                            <i class="fa-solid fa-play animate-pulse"></i>
+                            <span id="turn-player-name">Сіздің кезегіңіз</span>
+                        </div>
+                    </div>
+
+                    <button onclick="confirmExitGame()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-sm font-semibold border border-slate-700 transition">
+                        Ойыннан шығу
+                    </button>
+                </div>
+
+                <!-- BOT AREA -->
+                <div id="player-bot" class="glass-panel p-4 rounded-2xl border border-slate-700/60 flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-full bg-indigo-900/80 border-2 border-indigo-400 flex items-center justify-center text-2xl shadow-lg">
+                            🤖
+                        </div>
+                        <div>
+                            <span class="font-bold text-lg text-white block">Бот Арай</span>
+                            <span class="text-xs text-slate-400">Өнегелі оқушы-бот</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-6">
+                        <div class="bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-800 text-center">
+                            <span class="text-xs text-slate-400 block">Қолдағы картасы</span>
+                            <span class="font-black text-indigo-400 text-xl" id="bot-cards-count">5</span>
+                        </div>
+                        <div class="bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-800 text-center">
+                            <span class="text-xs text-slate-400 block">Ұпайы</span>
+                            <span class="font-black text-amber-400 text-xl" id="bot-score">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CENTER BOARD -->
+                <div class="bg-slate-950/70 rounded-2xl p-6 border border-slate-800/80 flex flex-col items-center justify-center relative min-h-[240px] mb-6">
+                    <div class="flex items-center justify-center space-x-12">
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-slate-400 block mb-2">ҚОР (ТАРТУ)</span>
+                            <div onclick="drawCardFromDeck()" class="w-24 h-36 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-600 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-400 transition shadow-xl group">
+                                <div class="w-12 h-16 rounded-lg bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center font-black text-indigo-300 text-lg group-hover:scale-110 transition">
+                                    UNO
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-400 mt-2">Басып ал</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <span class="text-xs font-bold text-slate-400 block mb-2">ОЙЫНДАҒЫ КАРТА</span>
+                            <div id="discard-pile" class="w-24 h-36 rounded-xl bg-uno-red border-2 border-white/60 flex flex-col justify-between p-2 shadow-2xl relative">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="color-indicator" class="mt-4 px-4 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs font-bold text-slate-300 flex items-center space-x-2">
+                        <span>Сәйкес түс:</span>
+                        <span id="current-color-name" class="text-rose-400 font-extrabold">Қызыл</span>
+                        <span id="current-color-dot" class="w-3.5 h-3.5 rounded-full bg-red-500 inline-block"></span>
+                    </div>
+                </div>
+
+                <!-- HUMAN PLAYER AREA -->
+                <div id="player-human" class="bg-slate-900/90 p-5 rounded-2xl border border-indigo-500/40">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 font-bold">
+                                🎓
+                            </div>
+                            <div>
+                                <span class="font-bold text-white block leading-tight" id="human-player-name">Сіз</span>
+                                <span class="text-xs text-slate-400">Қолдағы карталарыңыз (жүріс жасау үшін басыңыз)</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800 px-4 py-1.5 rounded-xl border border-slate-700">
+                            <span class="text-xs text-slate-400 mr-2">Ұпай:</span>
+                            <span class="font-black text-amber-400 text-lg" id="human-score">0</span>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto pb-2">
+                        <div id="human-cards-container" class="flex space-x-3 min-w-max p-2">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. QUESTION MODAL -->
+        <div id="modal-question" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+            <div class="glass-panel max-w-lg w-full p-6 rounded-3xl border border-slate-700 shadow-2xl relative">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="bg-indigo-600/40 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-indigo-500/30">
+                        <i class="fa-solid fa-circle-question mr-1"></i> UNO Сұрағы
+                    </span>
+                    <span class="text-xs text-amber-400 font-semibold" id="modal-card-type">Тапсырма</span>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mb-6 leading-snug" id="question-text">
+                    Сұрақ осы жерде шығады?
+                </h3>
+
+                <div class="space-y-3 mb-6" id="options-container">
+                </div>
+
+                <div class="text-center text-xs text-slate-400">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i>
+                    Дұрыс жауап берсеңіз +100 ұпай аласыз және карта тасталады!
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. COLOR PICKER MODAL -->
+        <div id="modal-color-picker" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+            <div class="glass-panel max-w-sm w-full p-6 rounded-3xl border border-slate-700 shadow-2xl text-center">
+                <h3 class="text-xl font-bold text-white mb-4">Жаңа түсті таңдаңыз</h3>
+                <p class="text-xs text-slate-400 mb-6">Жүрісті жалғастыру үшін түсті белгілеңіз</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="chooseColor('red')" class="py-4 bg-uno-red text-white font-bold rounded-2xl border border-white/30 hover:scale-105 transition shadow-lg">Қызыл</button>
+                    <button onclick="chooseColor('blue')" class="py-4 bg-uno-blue text-white font-bold rounded-2xl border border-white/30 hover:scale-105 transition shadow-lg">Көк</button>
+                    <button onclick="chooseColor('green')" class="py-4 bg-uno-green text-white font-bold rounded-2xl border border-white/30 hover:scale-105 transition shadow-lg">Жасыл</button>
+                    <button onclick="chooseColor('yellow')" class="py-4 bg-uno-yellow text-white font-bold rounded-2xl border border-white/30 hover:scale-105 transition shadow-lg">Сары</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5b. DRAW CHOICE MODAL -->
+        <div id="modal-draw-choice" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+            <div class="glass-panel max-w-sm w-full p-6 rounded-3xl border border-slate-700 shadow-2xl text-center">
+                <h3 class="text-xl font-bold text-white mb-2">Қордан карта алдыңыз</h3>
+                <p class="text-xs text-slate-400 mb-5">Бұл карта жердегі картаның үстіне жүреді. Не істейсіз?</p>
+                <div id="draw-choice-card" class="flex justify-center mb-6"></div>
+                <div class="space-y-3">
+                    <button onclick="playDrawnCard()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Жүремін (картаны қоямын)</span>
+                    </button>
+                    <button onclick="keepDrawnCard()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl border border-slate-700 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-hand"></i>
+                        <span>Алып қаламын</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. RESULT MODAL -->
+        <div id="modal-result" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
+            <div class="glass-panel max-w-md w-full p-8 rounded-3xl border border-amber-500/40 shadow-2xl text-center relative overflow-hidden">
+                <div id="result-trophy-container" class="mb-4"></div>
+                <h2 id="result-main-title" class="text-2xl font-black text-white mb-2 leading-tight"></h2>
+                <div id="result-score-details" class="text-slate-300 mb-6 space-y-1"></div>
+
+                <div class="space-y-3">
+                    <button onclick="restartCurrentGame()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Қайта ойнау</span>
+                    </button>
+                    <button onclick="returnToMainMenu()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl border border-slate-700 transition flex items-center justify-center space-x-2 text-sm">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Басты мәзірге қайту</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. LEADERBOARD SCREEN -->
+        <section id="screen-leaderboard" class="hidden w-full max-w-4xl">
+            <div class="glass-panel p-8 rounded-3xl shadow-2xl border border-slate-700">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black text-white flex items-center space-x-3">
+                            <i class="fa-solid fa-trophy text-amber-400"></i>
+                            <span>Оқушылар Рейтингі (Leaderboard)</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm">Пән мұғалімі үшін тікелей бақылау нәтижелері</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="renderLeaderboard()" class="bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 px-4 py-2.5 rounded-xl text-sm font-bold border border-indigo-500/40 transition flex items-center space-x-2">
+                            <i class="fa-solid fa-rotate"></i><span>Жаңарту</span>
+                        </button>
+                        <button onclick="goBackFromLeaderboard()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold border border-slate-700 transition">
+                            Кері қайту
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-slate-400 text-xs uppercase tracking-wider">
+                                <th class="p-4">Орын</th>
+                                <th class="p-4">Оқушы аты-жөні</th>
+                                <th class="p-4">Сынып</th>
+                                <th class="p-4">Тақырып</th>
+                                <th class="p-4">Ең жоғары ұпай</th>
+                                <th class="p-4">Ойын саны</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-rows" class="divide-y divide-slate-800 text-sm font-semibold">
+                        </tbody>
+                    </table>
+                </div>
+                <p id="leaderboard-status" class="text-xs text-slate-500 mt-4"></p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel py-4 text-center text-xs text-slate-500 border-t border-slate-800">
+        © 2026 "Әдеби UNO" — Қазақ әдебиеті пәніне арналған интерактивті оқу құралы
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const QUESTION_BANK = {
+            "dospambet": [
+                { q: "Доспамбет жырау қай қалада дүниеге келген?", correct: "Азау қаласы", wrong: ["Отырар", "Дехистан"] },
+                { q: "Доспамбет жырау қай кезеңде өмір сүрген?", correct: "XV ғасырдың соңы – XVI ғасырдың басы", wrong: ["XIV ғасырдың басы", "XVII ғасырдың соңы"] },
+                { q: "Жыраудың ой-толғанысын жырмен жеткізетін әдеби жанр қалай аталады?", correct: "Толғау", wrong: ["Ертегі", "Дастан"] },
+                { q: "Доспамбеттің Ақ Жайыққа арнаған толғауы қалай аталады?", correct: "«Айналайын, Ақ Жайық»", wrong: ["«Қоғалы көлдер, қом сулар»", "«Өкінбес»"] },
+                { q: "«Айналайын, Ақ Жайық» атауында қай өзен аталады?", correct: "Жайық өзені", wrong: ["Еділ өзені", "Сырдария өзені"] },
+                { q: "Алыстағы елін, өскен өлкесін аңсау сезімі қалай аталады?", correct: "Туған жерге сағыныш", wrong: ["Өкініш", "Қуаныш"] },
+                { q: "Жырау шығармаларында ел қорғаған батырдың қандай қасиеті дәріптеледі?", correct: "Ерлік", wrong: ["Сараңдық", "Қулық"] },
+                { q: "Жорыққа қатысып, ел қорғаған Доспамбетті қандай жырау дейміз?", correct: "Жауынгер жырау", wrong: ["Ғалым жырау", "Аудармашы жырау"] },
+                { q: "«Қоғалы көлдер, қом сулар» толғауында жол соңында қай сөз қайталанады?", correct: "«Өкінбес»", wrong: ["«Сағыныш»", "«Қарағай»"] },
+                { q: "Бір сөздің бірнеше рет келуі қандай көркемдік тәсіл?", correct: "Қайталау", wrong: ["Теңеу", "Эпитет"] },
+                { q: "«Күн қайда?» деген жауап күтпейтін сауал қандай тәсілге жатады?", correct: "Риторикалық сұрақ", wrong: ["Теңеу", "Эпитет"] },
+                { q: "«Арғымақтай» сөзіндегі -тай жұрнағы қандай көркемдік тәсіл жасайды?", correct: "Теңеу", wrong: ["Қайталау", "Метафора"] },
+                { q: "Доспамбеттің қоныс пен еркін өмірді дәріптейтін толғауы қалай аталады?", correct: "«Қоғалы көлдер, қом сулар»", wrong: ["«Қашықтасың туған жер»", "«Өкінбес»"] },
+                { q: "Мекен, тұрақ мағынасын беретін сөз қалай аталады?", correct: "Қоныс", wrong: ["Жайлау", "Өзен"] },
+                { q: "Елін, жерін сүю, Отанын қорғауға дайын болу қандай құндылық?", correct: "Отансүйгіштік", wrong: ["Мансапқорлық", "Сабырлылық"] },
+                { q: "Толғау айтып, елдік ой қозғайтын сөз өнерінің өкілі кім?", correct: "Жырау", wrong: ["Ғалым", "Саудагер"] },
+                { q: "«Қоғалы көлдер, қом сулар» мен «Айналайын, Ақ Жайық» толғауларының авторы кім?", correct: "Доспамбет жырау", wrong: ["Бұқар жырау", "Әл-Фараби"] }
+            ],
+            "alfarabi": [
+                { q: "Әл-Фараби қай қалада дүниеге келген?", correct: "Отырар", wrong: ["Азау", "Сайрам"] },
+                { q: "Әл-Фарабидің туған жерге сағынышын білдіретін өлеңі қалай аталады?", correct: "«Қашықтасың туған жер»", wrong: ["«Өкінбес»", "«Айналайын, Ақ Жайық»"] },
+                { q: "«Қашықтасың туған жер» өлеңінде қандай сезім басым?", correct: "Сағыныш", wrong: ["Қуаныш", "Ашу"] },
+                { q: "«Тіршілікте құрыштай бол төзімді» өлеңі адамды қандай қасиетке шақырады?", correct: "Төзімділік", wrong: ["Сараңдық", "Қулық"] },
+                { q: "Осы өлеңдегі «Тағдырыңды еш уақытта жазғырма» деген кеңестің мәні қандай?", correct: "Тағдырды жазғырмау", wrong: ["Қиындықтан қашу", "Өткенге өкіну"] },
+                { q: "«Өрге жүзген өнегелі ісімен» деген жолда қандай дос дәріптеледі?", correct: "Адал дос", wrong: ["Жалған дос", "Амал дос"] },
+                { q: "Ақын «Адал дос іздегенде» досты кімдердің арасынан іздеуге кеңес береді?", correct: "Өз теңінің ішінен", wrong: ["Жат жұрттың ішінен", "Бай адамдардың ішінен"] },
+                { q: "«Жүргендер көп достық атын малданып» өлеңінде ақын кімдерден сақтандырады?", correct: "Жалған достардан", wrong: ["Ұстаздардан", "Ағайындардан"] },
+                { q: "Жалған достарға алданып қалмау үшін достықтан қандай қасиетті іздеу керек?", correct: "Адалдық", wrong: ["Байлық", "Атақ"] },
+                { q: "«Жүргендер көп достық атын малданып» өлеңінің негізгі тақырыбы қандай?", correct: "Достық", wrong: ["Табиғат", "Туған жер"] },
+                { q: "Достықтың берік болуы үшін бір-біріне арқа сүйеуді білдіретін қандай қасиет қажет?", correct: "Сенім", wrong: ["Қызғаныш", "Мақтаныш"] },
+                { q: "«Қашықтасың туған жер» өлеңінде ақын нені аңсайды?", correct: "Туған жер", wrong: ["Жаңа қала", "Байлық"] },
+                { q: "«Қалың елім» тіркесінде ақын қандай қауымды меңзейді?", correct: "Ел", wrong: ["Қалың орман", "Әскер"] },
+                { q: "Адалдық, достық, мейірім қандай ортақ құндылыққа жатады?", correct: "Адамгершілік", wrong: ["Байлық", "Мансап"] },
+                { q: "Қиындық кезінде асықпай, ұстамды болу қасиеті қалай аталады?", correct: "Сабырлылық", wrong: ["Асығыстық", "Ашушаңдық"] },
+                { q: "Ақыл-кеңес пен ғибрат айтуға құрылған поэзия қалай аталады?", correct: "Дидактикалық поэзия", wrong: ["Лирикалық поэзия", "Драмалық поэзия"] },
+                { q: "«Қашықтасың туған жер», «Тіршілікте құрыштай бол төзімді» өлеңдерінің авторы кім?", correct: "Әл-Фараби", wrong: ["Доспамбет жырау", "Фирдоуси"] }
+            ],
+            "ayazbi": [
+                { q: "Мадан ханның қанша уәзірі болған?", correct: "Қырық уәзір", wrong: ["Он уәзір", "Жеті уәзір"] },
+                { q: "Хан уәзірлеріне қандай тапсырма берді?", correct: "Адамның, құстың, шөптің жаманын табу", wrong: ["Ел шекарасын күзету", "Қазына жинау"] },
+                { q: "Уәзірлер адамның жаманы деп кімді таңдады?", correct: "Жаман", wrong: ["Мадан хан", "Бас уәзір"] },
+                { q: "Уәзірлер алғаш шөптің жаманы деп нені таңдады?", correct: "Шеңгел", wrong: ["Қамыс", "Қарағай"] },
+                { q: "Қырғауыл жануарлардың қай тобына жатады?", correct: "Құс", wrong: ["Аң", "Балық"] },
+                { q: "Уәзірлер алғаш құстың жаманы деп нені таңдады?", correct: "Қырғауыл", wrong: ["Сауысқан", "Бүркіт"] },
+                { q: "Қырғауылдың орнына сауысқанды алуды кім ұсынды?", correct: "Жаман", wrong: ["Мадан хан", "Бас уәзір"] },
+                { q: "Жаман ел билегенде қандай атқа ие болды?", correct: "Аяз би", wrong: ["Мадан хан", "Төле би"] },
+                { q: "Аяз би елге қандай би ретінде танылды?", correct: "Дана би", wrong: ["Қатал би", "Сараң би"] },
+                { q: "Жаманның дұрыс шешім табуына көмектескен басты қасиеті қандай?", correct: "Ақылдылық", wrong: ["Күштілік", "Байлық"] },
+                { q: "Қиын сұрақтарға ұтымды жауап беруінен қандай қасиеті көрінеді?", correct: "Тапқырлық", wrong: ["Ашушаңдық", "Жалқаулық"] },
+                { q: "Аяз би ел билегенде қандай ұстанымды басшылыққа алды?", correct: "Әділдік", wrong: ["Мансапқорлық", "Қатыгездік"] },
+                { q: "Мансапқа мастанбау, өзін өзгелерден жоғары қоймау қандай қасиет?", correct: "Кішіпейілділік", wrong: ["Менмендік", "Сараңдық"] },
+                { q: "Аяз би бұрынғы тұрмысын еске алу үшін қандай киімдерін сақтады?", correct: "Жыртық тон мен жаман тымақ", wrong: ["Алтын шапан", "Күміс сауыт"] },
+                { q: "Ескі киімдерін сақтауының мәні неде?", correct: "Өткенін ұмытпау", wrong: ["Мақтану", "Сату үшін"] },
+                { q: "«Аяз би» авторы белгісіз, ауызша тараған қандай шығарма?", correct: "Халық ертегісі", wrong: ["Тарихи роман", "Батырлар жыры"] },
+                { q: "Ертегі басында қырық уәзіріне тапсырма берген хан кім?", correct: "Мадан хан", wrong: ["Аяз би", "Абылай хан"] }
+            ],
+            "alpertunga": [
+                { q: "Алып Ер Тұңға қай елдің билеушісі болған?", correct: "Тұран", wrong: ["Иран", "Дехистан"] },
+                { q: "Тұран елі қай елмен соғысқан?", correct: "Иран", wrong: ["Мысыр", "Қытай"] },
+                { q: "«Шаһнама» дастанының авторы кім?", correct: "Фирдоуси", wrong: ["Махмұд Қашқари", "Әл-Фараби"] },
+                { q: "«Шаһнамада» Алып Ер Тұңға қалай аталады?", correct: "Афрасиаб", wrong: ["Рүстем", "Кей-Хұсрау"] },
+                { q: "Афрасиабпен жекпе-жекке шыққан Иран батыры кім?", correct: "Рүстем", wrong: ["Кей-Хұсрау", "Фирдоуси"] },
+                { q: "Рүстемнің әкесі кім?", correct: "Зал", wrong: ["Афрасиаб", "Кей-Хұсрау"] },
+                { q: "Залдың ұлы кім?", correct: "Рүстем", wrong: ["Афрасиаб", "Кей-Хұсрау"] },
+                { q: "Рүстеммен бірге Тұранға қарсы жорық жасаған Иран билеушісі кім?", correct: "Кей-Хұсрау", wrong: ["Зал", "Афрасиаб"] },
+                { q: "Кей-Хұсрау қай батырмен бірігіп Тұранға шабуыл жасады?", correct: "Рүстем", wrong: ["Афрасиаб", "Фирдоуси"] },
+                { q: "Рүстем мен Алып Ер Тұңғаның жекпе-жегі қалай аяқталды?", correct: "Тең түсті", wrong: ["Рүстем жеңді", "Алып Ер Тұңға жеңді"] },
+                { q: "Тұран мен Иран әскері алғаш қай жерде шайқасты?", correct: "Дехистан", wrong: ["Отырар", "Сайрам"] },
+                { q: "Дехистанда Иран әскерін жеңген қолбасшы кім?", correct: "Ер Тұңға", wrong: ["Рүстем", "Кей-Хұсрау"] },
+                { q: "Иран әскерін жеңгеннен кейін Ер Тұңғаға қандай атақ берілді?", correct: "Алып", wrong: ["Дана", "Шешен"] },
+                { q: "«Алып» сөзі қандай мағынаны білдіреді?", correct: "Батыр", wrong: ["Ақылшы", "Хан"] },
+                { q: "Батыр қазасына байланысты шығарылған жырдың түрі қандай?", correct: "Жоқтау", wrong: ["Жар-жар", "Бесік жыры"] },
+                { q: "Жоқтауды «Диуани лұғат ат-түрік» еңбегіне енгізген кім?", correct: "Махмұд Қашқари", wrong: ["Фирдоуси", "Доспамбет жырау"] },
+                { q: "Махмұд Қашқари еңбегінде кімге арналған жоқтау сақталған?", correct: "Алып Ер Тұңға", wrong: ["Рүстем", "Кей-Хұсрау"] }
+            ]
+        };
+
+        const TOPIC_TITLES = {
+            "dospambet": "Доспамбет жырау",
+            "alfarabi": "Әл-Фараби",
+            "ayazbi": "Аяз би",
+            "alpertunga": "Алып Ер Тұңға"
+        };
+
+        // ================= БАПТАУ =================
+        // Рейтинг барлық оқушыдан бір жерге жиналуы үшін Firebase Realtime Database сілтемесін осында қойыңыз.
+        // Мысалы: "https://uno-abc123-default-rtdb.firebaseio.com"
+        // Бос қалса, нәтиже тек сол құрылғыда (жергілікті) сақталады.
+        const FIREBASE_URL = "";
+        const ONLINE = FIREBASE_URL.trim() !== "";
+        const LOCAL_KEY = 'uno_leaderboard_app';
+        let leaderboardTimer = null;
+        let botTimer = null;
+
+        function escapeHtml(str) {
+            return String(str ?? "").replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[ch]));
+        }
+
+        function dbUrl() {
+            return FIREBASE_URL.trim().replace(/\/+$/, '') + '/scores.json';
+        }
+
+        async function saveScoreRecord(rec) {
+            if (ONLINE) {
+                const r = await fetch(dbUrl(), { method: 'POST', body: JSON.stringify(rec) });
+                if (!r.ok) throw new Error('Сақтау қатесі: ' + r.status);
+            } else {
+                const arr = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+                arr.push(rec);
+                localStorage.setItem(LOCAL_KEY, JSON.stringify(arr));
+            }
+        }
+
+        async function loadScoreRecords() {
+            if (ONLINE) {
+                const r = await fetch(dbUrl());
+                if (!r.ok) throw new Error('Оқу қатесі: ' + r.status);
+                const data = await r.json();
+                return data ? Object.values(data) : [];
+            }
+            return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+        }
+
+        // Әр оқушының ең жоғары ұпайын алып, кему ретімен сұрыптайды
+        function buildRanking(records) {
+            const best = new Map();
+            records.forEach(r => {
+                if (!r || typeof r.score !== 'number') return;
+                const key = String(r.name || '').trim().toLowerCase() + '|' + r.grade;
+                const cur = best.get(key);
+                if (!cur) {
+                    best.set(key, { ...r, time: r.time || 0, games: 1 });
+                } else {
+                    cur.games++;
+                    if (r.score > cur.score) {
+                        cur.score = r.score;
+                        cur.topic = r.topic;
+                        cur.time = r.time || 0;
+                    }
+                }
+            });
+            return [...best.values()].sort((a, b) => b.score - a.score || a.time - b.time);
+        }
+
+        let currentUser = { name: "", grade: "6" };
+        let currentTopicKey = "dospambet";
+        let currentQuarter = 1;
+
+        let gameState = {
+            players: [],
+            turnIndex: 0,
+            discardPile: [],
+            drawPile: [],
+            currentColor: "red",
+            activeCardToPlay: null,
+            isGameOver: false,
+            resultShown: false,
+            pendingDraw: null
+        };
+
+        const CARD_COLORS = ['red', 'blue', 'green', 'yellow'];
+
+        function showScreen(screenId) {
+            ['screen-login', 'screen-nav', 'screen-game', 'screen-leaderboard'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+
+            clearInterval(leaderboardTimer);
+            leaderboardTimer = null;
+            if (screenId === 'screen-leaderboard') {
+                renderLeaderboard();
+                leaderboardTimer = setInterval(renderLeaderboard, 8000);
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('input-name').value.trim();
+            const gradeInput = document.getElementById('input-grade').value;
+
+            if (!nameInput) return;
+
+            currentUser.name = nameInput;
+            currentUser.grade = gradeInput;
+
+            document.getElementById('display-user-name').innerText = currentUser.name;
+            document.getElementById('display-user-grade').innerText = currentUser.grade + "-сынып";
+            document.getElementById('header-user-info').classList.remove('hidden');
+
+            renderTopics();
+            showScreen('screen-nav');
+        }
+
+        function logout() {
+            currentUser = { name: "", grade: "6" };
+            document.getElementById('header-user-info').classList.add('hidden');
+            showScreen('screen-login');
+        }
+
+        function openTeacherMode() {
+            showScreen('screen-leaderboard');
+        }
+
+        function goBackFromLeaderboard() {
+            if (currentUser.name) showScreen('screen-nav');
+            else showScreen('screen-login');
+        }
+
+        function selectGrade(grade) {
+            currentUser.grade = grade;
+            ['6', '7', '10'].forEach(g => {
+                const btn = document.getElementById(`btn-grade-${g}`);
+                if (btn) {
+                    if (g === grade) {
+                        btn.className = "px-5 py-2.5 rounded-lg font-bold text-sm transition bg-indigo-600 text-white shadow-lg";
+                    } else {
+                        btn.className = "px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-400 hover:text-white";
+                    }
+                }
+            });
+            renderTopics();
+        }
+
+        function selectQuarter(q) {
+            currentQuarter = q;
+            renderTopics();
+        }
+
+        function renderTopics() {
+            const grid = document.getElementById('games-grid');
+            grid.innerHTML = "";
+
+            if (currentUser.grade === "6" && currentQuarter === 1) {
+                const topics = [
+                    { key: "dospambet", name: "Доспамбет жырау", desc: "Жыраудың өмірі мен толғаулары бойынша UNO ойыны", icon: "📜", color: "from-rose-500 to-red-600" },
+                    { key: "alfarabi", name: "Әл-Фараби", desc: "Әл-Фарабидің өлеңдері мен достық тақырыбындағы UNO", icon: "🏛️", color: "from-blue-500 to-indigo-600" },
+                    { key: "ayazbi", name: "Аяз би", desc: "«Аяз би» халық ертегісі бойынша дайындалған UNO", icon: "👑", color: "from-emerald-500 to-green-600" },
+                    { key: "alpertunga", name: "Алып Ер Тұңға", desc: "«Алып Ер Тұңғаны жоқтау» жыры бойынша UNO", icon: "🛡️", color: "from-amber-500 to-yellow-600" }
+                ];
+
+                topics.forEach(t => {
+                    const card = document.createElement('div');
+                    card.className = "glass-panel p-6 rounded-2xl border border-slate-700/80 hover:border-indigo-500 transition duration-300 flex flex-col justify-between group cursor-pointer relative overflow-hidden";
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr ${t.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition">
+                                ${t.icon}
+                            </div>
+                            <span class="bg-indigo-600/30 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-indigo-500/30">
+                                UNO Ойын
+                            </span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold text-white mb-2 group-hover:text-amber-400 transition">${t.name}</h4>
+                            <p class="text-slate-400 text-xs leading-relaxed mb-6">${t.desc}</p>
+                        </div>
+                        <button onclick="startUnoGame('${t.key}')" class="w-full py-3 bg-slate-800 group-hover:bg-indigo-600 text-white font-bold rounded-xl transition flex items-center justify-center space-x-2 text-sm shadow-md">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Ойынды бастау</span>
+                        </button>
+                    `;
+                    grid.appendChild(card);
+                });
+            } else {
+                grid.innerHTML = `
+                    <div class="col-span-2 glass-panel p-12 rounded-2xl text-center text-slate-400">
+                        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-600"></i>
+                        <p class="font-bold">Бұл сынып/тоқсан бойынша ойындар дайындалуда.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function startUnoGame(topicKey) {
+            currentTopicKey = topicKey;
+            clearTimeout(botTimer);
+            document.getElementById('modal-draw-choice').classList.add('hidden');
+            document.getElementById('game-topic-title').innerText = TOPIC_TITLES[topicKey];
+            document.getElementById('human-player-name').innerText = currentUser.name || "Оқушы";
+
+            document.getElementById('modal-result').classList.add('hidden');
+
+            gameState = {
+                players: [
+                    { id: 'human', name: currentUser.name || "Оқушы", cards: [], score: 0, isBot: false },
+                    { id: 'bot', name: "Бот Арай", cards: [], score: 0, isBot: true }
+                ],
+                turnIndex: 0,
+                discardPile: [],
+                drawPile: generateDeck(topicKey),
+                currentColor: "red",
+                activeCardToPlay: null,
+                isGameOver: false,
+            resultShown: false,
+            pendingDraw: null
+            };
+
+            shuffle(gameState.drawPile);
+            gameState.questionPool = shuffle([...(QUESTION_BANK[topicKey] || QUESTION_BANK["dospambet"])]);
+
+            for (let i = 0; i < 5; i++) {
+                gameState.players.forEach(p => {
+                    if (gameState.drawPile.length > 0) p.cards.push(gameState.drawPile.pop());
+                });
+            }
+
+            let topCard = gameState.drawPile.pop();
+            while (topCard.type !== 'standard') {
+                gameState.drawPile.unshift(topCard);
+                topCard = gameState.drawPile.pop();
+            }
+            gameState.discardPile.push(topCard);
+            gameState.currentColor = topCard.color;
+
+            updateUI();
+            showScreen('screen-game');
+        }
+
+        function generateDeck(topicKey) {
+            const deck = [];
+            const qList = QUESTION_BANK[topicKey] || QUESTION_BANK["dospambet"];
+
+            // Әр сұраққа бір карта (17 сұрақ = 17 қарапайым карта)
+            qList.forEach((qObj, idx) => {
+                deck.push({
+                    id: 'card-' + Math.random().toString(36).substr(2, 9),
+                    type: 'standard',
+                    color: CARD_COLORS[idx % 4],
+                    label: "Сұрақ #" + (idx + 1)
+                });
+            });
+
+            // Арнайы карталар
+            CARD_COLORS.forEach(c => {
+                deck.push({ id: 'sp-' + Math.random(), type: 'plus2', color: c, label: '+2 Карта' });
+            });
+            for (let k = 0; k < 2; k++) {
+                deck.push({ id: 'wild-' + Math.random(), type: 'wild', color: 'wild', label: 'Түсті ауыстыру' });
+            }
+
+            return deck;
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function updateUI() {
+            const currentPlayer = gameState.players[gameState.turnIndex];
+            
+            const turnBadge = document.getElementById('turn-badge');
+            const turnName = document.getElementById('turn-player-name');
+            if (currentPlayer.isBot) {
+                turnName.innerText = "Бот Арай ойнауда...";
+                turnBadge.className = "flex items-center space-x-2 px-4 py-1.5 rounded-xl bg-indigo-600 text-white font-black text-sm active-turn-pulse";
+            } else {
+                turnName.innerText = "Сіздің кезегіңіз!";
+                turnBadge.className = "flex items-center space-x-2 px-4 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-black text-sm active-turn-pulse";
+            }
+
+            document.getElementById('human-score').innerText = gameState.players[0].score;
+            document.getElementById('bot-score').innerText = gameState.players[1].score;
+            document.getElementById('bot-cards-count').innerText = gameState.players[1].cards.length;
+
+            const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+            const discardEl = document.getElementById('discard-pile');
+            discardEl.className = `w-24 h-36 rounded-xl ${getCardBgClass(topCard.color)} border-2 border-white/80 flex flex-col justify-between p-2 shadow-2xl relative transform rotate-1 transition`;
+            discardEl.innerHTML = `
+                <div class="flex justify-between items-center text-[10px] font-bold text-white">
+                    <span>UNO</span>
+                    <span>${getCardSymbol(topCard)}</span>
+                </div>
+                <div class="text-center font-black text-white text-xs px-1 leading-tight">
+                    ${topCard.label}
+                </div>
+                <div class="text-right text-[10px] font-bold text-white">
+                    ${getCardSymbol(topCard)}
+                </div>
+            `;
+
+            const colorNameEl = document.getElementById('current-color-name');
+            const colorDotEl = document.getElementById('current-color-dot');
+            const colorMap = {
+                red: { name: 'Қызыл', class: 'bg-red-500', text: 'text-rose-400' },
+                blue: { name: 'Көк', class: 'bg-blue-500', text: 'text-blue-400' },
+                green: { name: 'Жасыл', class: 'bg-green-500', text: 'text-green-400' },
+                yellow: { name: 'Сары', class: 'bg-yellow-500', text: 'text-amber-400' }
+            };
+            const cInfo = colorMap[gameState.currentColor] || colorMap.red;
+            colorNameEl.innerText = cInfo.name;
+            colorNameEl.className = `${cInfo.text} font-extrabold`;
+            colorDotEl.className = `w-3.5 h-3.5 rounded-full ${cInfo.class} inline-block`;
+
+            renderHumanCards();
+        }
+
+        function getCardBgClass(color) {
+            switch(color) {
+                case 'red': return 'bg-uno-red';
+                case 'blue': return 'bg-uno-blue';
+                case 'green': return 'bg-uno-green';
+                case 'yellow': return 'bg-uno-yellow';
+                default: return 'bg-uno-wild';
+            }
+        }
+
+        function getCardSymbol(card) {
+            if (card.type === 'plus2') return '+2';
+            if (card.type === 'wild') return '🌈';
+            return '❓';
+        }
+
+        function renderHumanCards() {
+            const container = document.getElementById('human-cards-container');
+            container.innerHTML = "";
+            const human = gameState.players[0];
+            const isHumanTurn = (gameState.turnIndex === 0 && !gameState.isGameOver);
+
+            human.cards.forEach((card, index) => {
+                const playable = isHumanTurn && isCardPlayable(card);
+                const cardEl = document.createElement('div');
+                cardEl.className = `uno-card w-24 h-36 rounded-xl ${getCardBgClass(card.color)} border-2 border-white/60 flex flex-col justify-between p-2 shadow-lg cursor-pointer ${playable ? 'ring-4 ring-amber-400' : 'opacity-75'}`;
+                cardEl.onclick = () => {
+                    if (!isHumanTurn) return;
+                    if (playable) {
+                        onPlayCardClicked(card, index);
+                    } else {
+                        showNotification("Бұл карта жүріс түсіне немесе түріне сай келмейді!");
+                    }
+                };
+
+                cardEl.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-bold text-white">
+                        <span>${index + 1}</span>
+                        <span>${getCardSymbol(card)}</span>
+                    </div>
+                    <div class="text-center font-bold text-white text-xs px-1 leading-tight">
+                        ${card.label}
+                    </div>
+                    <div class="text-right text-[10px] font-bold text-white">
+                        ${getCardSymbol(card)}
+                    </div>
+                `;
+                container.appendChild(cardEl);
+            });
+        }
+
+        function isCardPlayable(card) {
+            const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+            if (card.type === 'wild') return true;
+            if (card.color === gameState.currentColor) return true;
+            if (card.type === topCard.type && card.type !== 'standard') return true;
+            return false;
+        }
+
+        // Сұрақтар қордан алынады: бәрі қолданылып біткенше қайталанбайды, сосын қор қайта араласады
+        function drawQuestion() {
+            if (!gameState.questionPool || gameState.questionPool.length === 0) {
+                gameState.questionPool = shuffle([...(QUESTION_BANK[currentTopicKey] || QUESTION_BANK["dospambet"])]);
+            }
+            const qObj = gameState.questionPool.pop();
+            return {
+                question: qObj.q,
+                correctAnswer: qObj.correct,
+                options: shuffle([qObj.correct, ...qObj.wrong])
+            };
+        }
+
+        function onPlayCardClicked(card, cardIndex) {
+            gameState.activeCardToPlay = { card, cardIndex };
+
+            const fresh = drawQuestion();
+            const prefix = card.type === 'plus2' ? "Арнайы карта! " : (card.type === 'wild' ? "Түсті ауыстыру үшін сұрақ: " : "");
+            card.question = prefix + fresh.question;
+            card.correctAnswer = fresh.correctAnswer;
+            card.options = fresh.options;
+            
+            document.getElementById('modal-card-type').innerText = card.label;
+            document.getElementById('question-text').innerText = card.question;
+
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = "";
+
+            card.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full py-3 px-4 bg-slate-800 hover:bg-indigo-600/70 text-white font-semibold rounded-xl border border-slate-700 hover:border-indigo-500 transition text-left flex items-center justify-between group";
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-white text-xs"></i>
+                `;
+                btn.onclick = () => submitAnswer(opt);
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById('modal-question').classList.remove('hidden');
+        }
+
+        function submitAnswer(selectedOpt) {
+            document.getElementById('modal-question').classList.add('hidden');
+            const active = gameState.activeCardToPlay;
+            if (!active) return;
+
+            const isCorrect = (selectedOpt === active.card.correctAnswer);
+
+            if (isCorrect) {
+                gameState.players[0].score += 100;
+                showNotification("Жарайсың! Дұрыс жауап! (+100 ұпай)");
+
+                gameState.players[0].cards.splice(active.cardIndex, 1);
+                gameState.discardPile.push(active.card);
+                if (active.card.color !== 'wild') {
+                    gameState.currentColor = active.card.color;
+                }
+
+                handleSpecialCardAction(active.card, () => {
+                    if (!checkWinCondition()) {
+                        // +2 қойған ойыншы қайта жүреді (қарсыласы карта алып, жүрісін өткізеді)
+                        if (active.card.type === 'plus2') {
+                            keepTurn();
+                        } else {
+                            nextTurn();
+                        }
+                    }
+                });
+            } else {
+                showNotification("Қате жауап! Қордан 1 карта алдыңыз.");
+                drawPenaltyCard(0, 1);
+                if (!checkWinCondition()) {
+                    nextTurn();
+                }
+            }
+        }
+
+        function handleSpecialCardAction(card, callback) {
+            if (card.type === 'wild' && gameState.turnIndex === 0) {
+                document.getElementById('modal-color-picker').classList.remove('hidden');
+                window.colorPickerCallback = () => callback();
+            } else {
+                if (card.type === 'plus2') {
+                    const opponentIndex = gameState.turnIndex === 0 ? 1 : 0;
+                    drawPenaltyCard(opponentIndex, 2);
+                    showNotification(`${gameState.players[opponentIndex].name} 2 карта алды және жүрісін өткізеді. Кезек қайта сізде!`);
+                }
+                callback();
+            }
+        }
+
+        function chooseColor(color) {
+            gameState.currentColor = color;
+            document.getElementById('modal-color-picker').classList.add('hidden');
+            if (window.colorPickerCallback) window.colorPickerCallback();
+        }
+
+        /* SAFE DRAW CARD FROM DECK - NEVER ENDS GAME PREMATURELY */
+        function drawCardFromDeck() {
+            if (gameState.turnIndex !== 0 || gameState.isGameOver || gameState.pendingDraw) return;
+
+            if (gameState.drawPile.length === 0) {
+                showNotification("Қорда карта таусылды!");
+                return;
+            }
+
+            const card = gameState.drawPile.pop();
+            gameState.players[0].cards.push(card);
+            updateUI();
+
+            if (isCardPlayable(card)) {
+                // Карта жердегі картаға жүреді — ойыншы өзі таңдайды
+                gameState.pendingDraw = card;
+                document.getElementById('draw-choice-card').innerHTML = `
+                    <div class="w-24 h-36 rounded-xl ${getCardBgClass(card.color)} border-2 border-white/70 flex flex-col justify-between p-2 shadow-2xl">
+                        <div class="flex justify-between items-center text-[10px] font-bold text-white">
+                            <span>UNO</span><span>${getCardSymbol(card)}</span>
+                        </div>
+                        <div class="text-center font-bold text-white text-xs px-1 leading-tight">${card.label}</div>
+                        <div class="text-right text-[10px] font-bold text-white">${getCardSymbol(card)}</div>
+                    </div>`;
+                document.getElementById('modal-draw-choice').classList.remove('hidden');
+            } else {
+                showNotification("Қордан 1 карта алдыңыз. Ол жүрмейді, кезек келесі ойыншыға өтті.");
+                if (!checkWinCondition()) {
+                    nextTurn();
+                }
+            }
+        }
+
+        function playDrawnCard() {
+            const card = gameState.pendingDraw;
+            if (!card) return;
+            gameState.pendingDraw = null;
+            document.getElementById('modal-draw-choice').classList.add('hidden');
+
+            const idx = gameState.players[0].cards.indexOf(card);
+            if (idx === -1) return;
+            onPlayCardClicked(card, idx);
+        }
+
+        function keepDrawnCard() {
+            if (!gameState.pendingDraw) return;
+            gameState.pendingDraw = null;
+            document.getElementById('modal-draw-choice').classList.add('hidden');
+            showNotification("Картаны қолыңызда қалдырдыңыз.");
+            if (!checkWinCondition()) {
+                nextTurn();
+            }
+        }
+
+        function drawPenaltyCard(playerIndex, count = 1) {
+            for (let i = 0; i < count; i++) {
+                if (gameState.drawPile.length > 0) {
+                    gameState.players[playerIndex].cards.push(gameState.drawPile.pop());
+                }
+            }
+            updateUI();
+        }
+
+        function canPlayerPlay(player) {
+            return player.cards.some(c => isCardPlayable(c));
+        }
+
+        // Қор бос және екі жақта да жүретін карта жоқ болса — тығырық
+        function isStalemate() {
+            return gameState.drawPile.length === 0 &&
+                !canPlayerPlay(gameState.players[0]) &&
+                !canPlayerPlay(gameState.players[1]);
+        }
+
+        // Кезек сол ойыншыда қалады (мысалы, +2 қойғаннан кейін)
+        function keepTurn() {
+            if (gameState.isGameOver) return;
+
+            if (isStalemate()) {
+                finishByScore();
+                return;
+            }
+
+            updateUI();
+            const current = gameState.players[gameState.turnIndex];
+
+            if (gameState.drawPile.length === 0 && !canPlayerPlay(current)) {
+                showNotification(`${current.name} жүріс жасай алмайды, кезек келесі ойыншыға өтті.`);
+                clearTimeout(botTimer);
+                botTimer = setTimeout(nextTurn, 1400);
+                return;
+            }
+
+            if (current.isBot) {
+                clearTimeout(botTimer);
+                botTimer = setTimeout(botPlayTurn, 1400);
+            }
+        }
+
+        function nextTurn() {
+            if (gameState.isGameOver) return;
+
+            if (isStalemate()) {
+                finishByScore();
+                return;
+            }
+
+            gameState.turnIndex = gameState.turnIndex === 0 ? 1 : 0;
+            updateUI();
+
+            const current = gameState.players[gameState.turnIndex];
+
+            // Қор бос, ал бұл ойыншыда жүретін карта жоқ — жүрісті өткізеді
+            if (gameState.drawPile.length === 0 && !canPlayerPlay(current)) {
+                showNotification(`${current.name} жүріс жасай алмайды, кезек келесі ойыншыға өтті.`);
+                clearTimeout(botTimer);
+                botTimer = setTimeout(nextTurn, 1400);
+                return;
+            }
+
+            if (current.isBot) {
+                clearTimeout(botTimer);
+                botTimer = setTimeout(botPlayTurn, 1400);
+            }
+        }
+
+        function botPlayTurn() {
+            if (gameState.isGameOver) return;
+
+            const bot = gameState.players[1];
+            let bonusTurn = false;
+            const playableCards = bot.cards.filter(c => isCardPlayable(c));
+
+            if (playableCards.length > 0) {
+                const cardToPlay = playableCards[0];
+                const cardIndex = bot.cards.indexOf(cardToPlay);
+
+                const isCorrect = Math.random() < 0.75;
+
+                if (isCorrect) {
+                    bot.score += 100;
+                    bot.cards.splice(cardIndex, 1);
+                    gameState.discardPile.push(cardToPlay);
+
+                    if (cardToPlay.color === 'wild') {
+                        gameState.currentColor = CARD_COLORS[Math.floor(Math.random() * 4)];
+                    } else {
+                        gameState.currentColor = cardToPlay.color;
+                    }
+
+                    showNotification(`Бот «${cardToPlay.label}» картасын ойнады.`);
+
+                    if (cardToPlay.type === 'plus2') {
+                        drawPenaltyCard(0, 2);
+                        showNotification("Бот сізге +2 карта берді! Жүрісіңіз өтіп кетті, бот қайта жүреді.");
+                        bonusTurn = true;
+                    }
+                } else {
+                    drawPenaltyCard(1, 1);
+                    showNotification("Бот сұрақтан қателесіп, қордан 1 карта алды.");
+                }
+            } else {
+                if (gameState.drawPile.length > 0) {
+                    drawPenaltyCard(1, 1);
+                    showNotification("Бот жүріс жасай алмай, қордан карта алды.");
+                }
+            }
+
+            if (!checkWinCondition()) {
+                if (bonusTurn) { keepTurn(); } else { nextTurn(); }
+            }
+        }
+
+        /* Ойын ТЕК біреуінің картасы бітсе аяқталады.
+           Қор бос болып, екі жақта да жүріс қалмаса — жалпы ұпай бойынша анықталады (nextTurn ішінде). */
+        function checkWinCondition() {
+            const human = gameState.players[0];
+            const bot = gameState.players[1];
+
+            if (human.cards.length === 0) {
+                finishGame(human);
+                return true;
+            }
+            if (bot.cards.length === 0) {
+                finishGame(bot);
+                return true;
+            }
+            return false;
+        }
+
+        function finishGame(winner) {
+            endGame(winner.id === 'human' ? 'win' : 'lose', 'cards');
+        }
+
+        function finishByScore() {
+            const h = gameState.players[0].score;
+            const b = gameState.players[1].score;
+            endGame(h > b ? 'win' : (h < b ? 'lose' : 'tie'), 'score');
+        }
+
+        function endGame(result, reason) {
+            if (gameState.resultShown) return;
+            gameState.resultShown = true;
+            gameState.isGameOver = true;
+            clearTimeout(botTimer);
+
+            const score = gameState.players[0].score;
+            const botScore = gameState.players[1].score;
+            showResultModal(result, score, botScore, reason);
+
+            saveToLeaderboard(score).then(ok => {
+                const el = document.getElementById('save-status');
+                if (!el) return;
+                if (ok) {
+                    el.className = "text-[11px] text-emerald-400 mt-2";
+                    el.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Нәтиже Мұғалім рейтингіне сақталды!';
+                } else {
+                    el.className = "text-[11px] text-rose-400 mt-2";
+                    el.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Нәтижені сақтау мүмкін болмады. Интернетті тексеріңіз.';
+                }
+            });
+        }
+
+        async function saveToLeaderboard(score) {
+            try {
+                await saveScoreRecord({
+                    name: currentUser.name || "Оқушы",
+                    grade: currentUser.grade || "6",
+                    topic: TOPIC_TITLES[currentTopicKey],
+                    score: score,
+                    time: Date.now()
+                });
+                return true;
+            } catch (err) {
+                console.error(err);
+                return false;
+            }
+        }
+
+        function showResultModal(result, score, botScore, reason) {
+            const trophyContainer = document.getElementById('result-trophy-container');
+            const titleElem = document.getElementById('result-main-title');
+            const detailsElem = document.getElementById('result-score-details');
+            const name = escapeHtml(currentUser.name || "Оқушы");
+
+            const views = {
+                win:  { icon: '🏆', box: 'bg-amber-500/20 border-amber-400 animate-bounce', title: '<span class="text-amber-400">🎉 Куттықтаймыз! Сіз жеңдіңіз!</span>' },
+                lose: { icon: '😔', box: 'bg-rose-500/20 border-rose-400', title: '<span class="text-rose-400">😔 Бұл жолы Бот жеңді...</span>' },
+                tie:  { icon: '🤝', box: 'bg-indigo-500/20 border-indigo-400', title: '<span class="text-indigo-300">🤝 Тең ойын!</span>' }
+            };
+            const v = views[result];
+
+            trophyContainer.innerHTML = `
+                <div class="w-20 h-20 mx-auto rounded-full ${v.box} border-2 flex items-center justify-center text-4xl shadow-xl">
+                    ${v.icon}
+                </div>`;
+            titleElem.innerHTML = v.title;
+
+            const reasonText = reason === 'cards'
+                ? 'Біреуінің карталары бітті.'
+                : 'Қор бітті, екі жақта да жүріс қалмады — жалпы ұпай бойынша анықталды.';
+
+            detailsElem.innerHTML = `
+                <p class="text-xs text-slate-400 mb-2">${reasonText}</p>
+                <p class="text-base font-semibold">Оқушы: <b class="text-white">${name}</b></p>
+                <p class="text-lg font-bold text-amber-400">Сіздің ұпайыңыз: <span class="text-2xl font-black">${score} балл</span></p>
+                <p class="text-sm text-slate-300">Бот Арай: <b>${botScore} балл</b></p>
+                <p id="save-status" class="text-[11px] text-slate-400 mt-2"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Нәтиже сақталуда...</p>
+            `;
+
+            document.getElementById('modal-result').classList.remove('hidden');
+        }
+
+        function restartCurrentGame() {
+            startUnoGame(currentTopicKey);
+        }
+
+        function returnToMainMenu() {
+            document.getElementById('modal-result').classList.add('hidden');
+            showScreen('screen-nav');
+        }
+
+        function confirmExitGame() {
+            if (confirm("Ойыннан шығуды растайсыз ба?")) {
+                gameState.isGameOver = true;
+                clearTimeout(botTimer);
+                showScreen('screen-nav');
+            }
+        }
+
+        function showNotification(msg) {
+            const toast = document.createElement('div');
+            toast.className = "fixed bottom-6 right-6 bg-slate-900 border border-amber-500/60 text-white px-5 py-3 rounded-2xl shadow-2xl z-50 text-sm font-bold flex items-center space-x-2 animate-bounce";
+            toast.innerHTML = `<i class="fa-solid fa-bell text-amber-400"></i><span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2400);
+        }
+
+        async function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-rows');
+            const status = document.getElementById('leaderboard-status');
+
+            try {
+                const ranking = buildRanking(await loadScoreRecords());
+                tbody.innerHTML = "";
+
+                if (ranking.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500">Әзірге нәтиже жоқ. Оқушылар ойнай бастағанда осында шығады.</td></tr>';
+                }
+
+                ranking.forEach((row, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/50 transition";
+
+                    let rankBadge = `<span class="font-bold text-slate-400">#${idx + 1}</span>`;
+                    if (idx === 0) rankBadge = `<span class="font-black text-amber-400">🥇 1</span>`;
+                    if (idx === 1) rankBadge = `<span class="font-black text-slate-300">🥈 2</span>`;
+                    if (idx === 2) rankBadge = `<span class="font-black text-amber-600">🥉 3</span>`;
+
+                    tr.innerHTML = `
+                        <td class="p-4">${rankBadge}</td>
+                        <td class="p-4 text-white font-bold">${escapeHtml(row.name)}</td>
+                        <td class="p-4"><span class="bg-slate-800 text-indigo-300 text-xs px-2.5 py-1 rounded-md border border-slate-700">${escapeHtml(row.grade)}-сынып</span></td>
+                        <td class="p-4 text-slate-300">${escapeHtml(row.topic)}</td>
+                        <td class="p-4 text-amber-400 font-black">${row.score} балл</td>
+                        <td class="p-4 text-slate-400">${row.games}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                const time = new Date().toLocaleTimeString('kk-KZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                status.className = "text-xs text-slate-500 mt-4";
+                status.innerText = `Қатысушылар: ${ranking.length} · Соңғы жаңарту: ${time}` +
+                    (ONLINE ? " · Автоматты түрде 8 секунд сайын жаңарады" : "");
+                if (!ONLINE) {
+                    status.className = "text-xs text-amber-400 mt-4";
+                    status.innerText += " · ⚠️ Жергілікті режим: нәтижелер тек осы құрылғыда сақталады (FIREBASE_URL бос)";
+                }
+            } catch (err) {
+                console.error(err);
+                status.className = "text-xs text-rose-400 mt-4";
+                status.innerText = "Рейтингті жүктеу мүмкін болмады. Интернетті немесе FIREBASE_URL-ді тексеріңіз.";
+            }
+        }
+
+        // Initialize App
+        window.onload = function() {
+            selectGrade('6');
+        };
+    </script>
+</body>
+</html>
